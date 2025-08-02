@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
+require("@chainlink/env-enc").config();
+require("./tasks");
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.20",
@@ -11,7 +12,13 @@ module.exports = {
         process.env.PRIVATE_KEY_2,
         process.env.PRIVATE_KEY_3,
       ],
+      timeout: 1000000,
+      chainId: 11155111,
+      gasPrice: "auto",
+      gas: "auto",
     },
-    hardhat: {},
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
 };
