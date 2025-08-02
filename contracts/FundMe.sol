@@ -13,7 +13,7 @@ contract FundMe {
 
     uint256 constant MINIMUM_VALUE = 1 * 10 ** 18; //USD
     
-    AggregatorV3Interface internal dataFeed;
+    AggregatorV3Interface public dataFeed;
 
     uint256 constant TARGET = 10 * 10 ** 18;
 
