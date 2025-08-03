@@ -5,9 +5,12 @@ require("hardhat-deploy");
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.20",
+  mocha: {
+    timeout: 500000,
+  },
   networks: {
     hardhat: {
-      // 本地测试网络 默认是hardhat
+      // 测试网络 默认是hardhat
     },
     sepolia: {
       url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
@@ -16,10 +19,8 @@ module.exports = {
         process.env.PRIVATE_KEY_2,
         process.env.PRIVATE_KEY_3,
       ],
-      timeout: 1000000,
+      timeout: 500000,
       chainId: 11155111,
-      gasPrice: "auto",
-      gas: "auto",
     },
   },
   etherscan: {
