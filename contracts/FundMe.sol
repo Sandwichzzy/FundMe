@@ -11,11 +11,11 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 contract FundMe {
     mapping(address => uint256) public fundersToAmount;
 
-    uint256 constant MINIMUM_VALUE = 1 * 10 ** 18; //USD
+    uint256 constant MINIMUM_VALUE = 100 * 10 ** 18; //USD
     
     AggregatorV3Interface public dataFeed;
 
-    uint256 constant TARGET = 10 * 10 ** 18;
+    uint256 constant TARGET = 1000 * 10 ** 18;
 
     address public owner;
 
@@ -25,6 +25,9 @@ contract FundMe {
     address erc20Addr;
 
     bool public getFundSuccess = false;
+
+    event FundWithdrawByOwner(uint256);
+    event RefundByFunder(address, uint256);
 
     constructor(uint256 _lockTime, address _dataFeedAddr) {
         // sepolia testnet
@@ -74,19 +77,24 @@ contract FundMe {
         
         // call: transfer ETH with data return value of function and bool 
         bool success;
-        (success, ) = payable(msg.sender).call{value: address(this).balance}("");
+        uint256 balance = address(this).balance;
+        (success, ) = payable(msg.sender).call{value: balance}("");
         require(success, "transfer tx failed");
         fundersToAmount[msg.sender] = 0;
         getFundSuccess = true; // flag
+        //emit event
+        emit FundWithdrawByOwner(balance);
     }
 
     function refund() external windowClosed {
         require(convertEthToUsd(address(this).balance) < TARGET, "Target is reached");
         require(fundersToAmount[msg.sender] != 0, "there is no fund for you");
         bool success;
-        (success, ) = payable(msg.sender).call{value: fundersToAmount[msg.sender]}("");
+        uint256 balance = fundersToAmount[msg.sender];
+        (success, ) = payable(msg.sender).call{value: balance}("");
         require(success, "transfer tx failed");
         fundersToAmount[msg.sender] = 0;
+        emit RefundByFunder(msg.sender, balance);
     }
 
     function setFunderToAmount(address funder, uint256 amountToUpdate) external {
